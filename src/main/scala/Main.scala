@@ -1,7 +1,8 @@
 package de.xixi.sparkcourse
 
+
 import org.apache.hadoop.shaded.org.apache.avro.generic.GenericData.StringType
-import org.apache.spark.sql.functions.{col, current_timestamp, expr, lit}
+import org.apache.spark.sql.functions.{col, current_timestamp, expr, lit,year}
 import org.apache.spark.sql.{DataFrame, SparkSession, functions}
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 object Main {
@@ -20,10 +21,25 @@ object Main {
     df.show()
     df.printSchema()
 
-    val timestampFromExpression = expr("cast(current_timestamp() as string) as timestampExpression")
-    val timestampFromFunction = current_timestamp().cast("string").as("timestampFunction")
+    val renameColumn = List(
+      col("Date").as("date"),
+      col("Open").as("open"),
+      col("High").as("high"),
+      col("Low").as("low"),
+      col("Close").as("close"),
+      col("Adj Close").as("adjClose"),
+      col("Volume").as("volume")
+    )
 
-    df.select(timestampFromFunction, timestampFromExpression).show()
+   val stockData =  df.select(renameColumn: _*)
+
+
+    stockData
+      .groupBy(year(col("date")))
+      .agg(functions.max(col("close")), functions.avg(col("close")))
+      .show()
+
+
 
 
   }
