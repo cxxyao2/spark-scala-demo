@@ -36,11 +36,14 @@ object Main {
 
     stockData
       .groupBy(year(col("date")))
-      .agg(functions.max(col("close")), functions.avg(col("close")))
+      .agg(functions.max(col("close")).as("maxClose"), functions.avg(col("close")).as("avgClose"))
+      .sort(col("maxClose").desc)
       .show()
 
-
-
+    stockData
+      .groupBy(year(col("date")).as("year"))
+      .max("close", "high")
+      .show()
 
   }
 }
